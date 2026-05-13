@@ -1,0 +1,6 @@
+[submodule "app"]
+	path = app
+	url = git@github.com:danboy/pinmonkey-app.git
+[submodule "api"]
+	path = api
+	url = git@github.com:danboy/pinmonkey-api.git
