@@ -12,6 +12,7 @@ Work through each item. Flag any that fail or need attention.
 - [ ] **Polymorphic type injection** — any `models[req.body.someType]` lookup must validate against an allowlist first.
 - [ ] **Response leakage** — no `password`, `member_id`, `owner_id` in responses. Use `attributes: { exclude: this.exclude }` or destructure before sending.
 - [ ] **Rate limiting** — login, signup, password reset, and any other unauthenticated write routes have `authLimiter` or `signupLimiter` applied.
+- [ ] **Guest delete tokens** — unauthenticated DELETE routes (e.g. guest karaoke) must verify a per-item `delete_token` generated with `randomBytes(32).toString('hex')` at creation time. Reject with 403 if token missing or mismatch.
 - [ ] **SSRF** — any server-side fetch uses `ALLOWED_HOSTS` allowlist; `https:` protocol enforced.
 - [ ] **Token expiry** — password reset tokens checked with `expires: { [Op.gt]: new Date() }`.
 - [ ] **User enumeration** — error responses for missing users are identical to success responses (same status, same shape).
