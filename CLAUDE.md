@@ -137,5 +137,27 @@ npm run storybook  # Storybook on port 6006
 
 ### Geolocation
 
-- `GeolocationProvider` (`app/src/providers/geolocationProvider.js`) is the single source via `watchPosition`. All components should read from context via `useGeolocation` hook (delegates to provider) — do not create independent `watchPosition` calls.
-- Falls back to default Chicago coordinates on error or unsupported browser.
+- `GeolocationProvider` (`app/src/providers/geolocationProvider.js`) is the single source. All components read via `useGeolocation` hook — never create independent `watchPosition` calls.
+- Runs two parallel `watchPosition` calls: one `enableHighAccuracy: false` (fast network fix) and one `enableHighAccuracy: true` (precise GPS). Both funnel through `applyUpdate`, which applies EMA smoothing (α=0.3) and rejects fixes worse than 200m accuracy.
+- IP geolocation fallback (`ipapi.co` → `ipinfo.io`) loads immediately while GPS warms up. Hard Chicago fallback only if both IP services fail.
+- Restarts watches and resets EMA on `visibilitychange` → visible (handles GPS drift after tab backgrounding).
+
+### Pinmonkey Dungeon Game
+
+Located at `app/src/pages/games/pinmonkey/`. Key patterns:
+
+**`useTileRegistry` (`hooks/use-tile-registry.js`)**
+- Accepts `(tiles, gridSize, entities = [])`. Pass `levelData.entities` from `main.js`.
+- Skips registering solid tiles at grid cells occupied by ladder entities — ladders are placed on solid tiles in the dungeon data and must remain passable.
+
+**`EntityRenderer` (`main.js`)**
+- Destructures every entity field and re-passes to `config`. Any field omitted from the destructure is silently `undefined` in `s.position.config`. Always add new entity fields to BOTH the destructure AND the config object.
+
+**Ladder system (`actors/player.js`)**
+- `activeLadderKeyRef` — key of the ladder currently locking the player out (prevents re-trigger until they step off). Set to the return ladder's key in the `pendingSpawn` effect so the destination ladder doesn't immediately fire back.
+- `ladderCooldownRef` — 30-frame grace period after spawning; ladder detection is skipped while > 0.
+- `spawnCheckRef` — set to spawn position after a level transition; BFS safety net runs on that position for one frame, then clears to null.
+- **Critical:** The `ladderAtSpawn` check in the BFS safety net MUST be gated on `spawnCheckRef.current != null`. Without this gate, the BFS fires every frame the player stands on a ladder tile, ejecting them before ladder detection can run.
+
+**Deploy**
+- `npm run deploy` — only run when explicitly instructed. It builds and pushes to production GCS.
