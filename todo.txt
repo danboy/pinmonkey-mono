@@ -1,0 +1,16 @@
+  normal: collectTreasure(id, 'normal') → API records with updated_at = NOW() → hidden_treasure_ids filters it out on reload for 24h. After 24h it reappears.
+  Works.
+
+  user_unique: same path + sessionCollected.add(id). DB record persists permanently (no 24h check). On every reload, API includes it in hidden_treasure_ids for
+   that save. Works.
+
+  global_unique: same, but hidden for all users. Works.
+
+  Gold items: collectTreasure IS called for gold (the call is after the if/else block, not inside it). Gold with user_unique behavior would be correctly
+  recorded.
+
+
+  Minor: handleCollectTreasure has session in its useCallback deps but never uses session in the body — causes unnecessary callback recreations.
+
+  Nothing functionally broken for the happy path. The silent API failure → respawn edge case is the only real concern.
+
