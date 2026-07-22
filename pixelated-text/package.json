@@ -1,0 +1,19 @@
+{
+  "name": "pixelated-text",
+  "version": "1.0.0",
+  "description": "Vanilla JS library that replaces text elements on a page with pixel-art (16x16) glyph renderings, looked up by element id.",
+  "license": "ISC",
+  "type": "commonjs",
+  "main": "src/pixelText.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "jsdom": "^24.0.0",
+    "vitest": "^1.6.0"
+  }
+}

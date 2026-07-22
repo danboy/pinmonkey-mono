@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>PixelText demo</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 2rem;
+    }
+    section {
+      margin-bottom: 2.5rem;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>PixelText demo</h1>
+
+  <section>
+    <label>Default (scale 2, black on transparent)</label>
+    <div id="headline">HELLO WORLD</div>
+  </section>
+
+  <section>
+    <label>Larger scale, custom colors</label>
+    <div id="score">SCORE: 042</div>
+  </section>
+
+  <section>
+    <label>options.text overrides the element's own text</label>
+    <div id="clock">this text is ignored</div>
+  </section>
+
+  <script src="../src/font.js"></script>
+  <script src="../src/pixelText.js"></script>
+  <script>
+    PixelText.replace('headline', { scale: 3 });
+
+    PixelText.replace('score', {
+      scale: 4,
+      pixelColor: '#39ff14',
+      backgroundColor: '#0d1b0d',
+      gap: 4,
+    });
+
+    PixelText.replace('clock', {
+      text: 'PIXEL TEXT LIB',
+      scale: 2,
+      pixelColor: '#ff2e63',
+    });
+  </script>
+</body>
+</html>
