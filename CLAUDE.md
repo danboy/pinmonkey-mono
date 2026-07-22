@@ -151,7 +151,7 @@ Located at `app/src/pages/games/pinmonkey/`. Key patterns:
 - Skips registering solid tiles at grid cells occupied by ladder entities — ladders are placed on solid tiles in the dungeon data and must remain passable.
 
 **`EntityRenderer` (`main.js`)**
-- Destructures every entity field and re-passes to `config`. Any field omitted from the destructure is silently `undefined` in `s.position.config`. Always add new entity fields to BOTH the destructure AND the config object.
+- Rest-spreads each entity into `config` (`const { x, y, _levelIndex, ...config } = entity`), so every entity field forwards to sprite actors automatically. New fields need no EntityRenderer change — just add them to the API payload / placement mapping.
 
 **Ladder system (`actors/player.js`)**
 - `activeLadderKeyRef` — key of the ladder currently locking the player out (prevents re-trigger until they step off). Set to the return ladder's key in the `pendingSpawn` effect so the destination ladder doesn't immediately fire back.

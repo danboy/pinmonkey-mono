@@ -28,43 +28,31 @@ border: 1px solid ${({ theme: { colors } }) => colors('highlight', 0.3)};
 
 ## Typography
 
-Font is always `'Inconsolata', monospace`. Labels are `text-transform: uppercase`, `font-size: 0.7rem`, `letter-spacing: 0.06em`.
+Font is always `'Silkscreen', monospace` (all pinmonkey game/editor text — loaded in `public/index.ejs`). Labels are `text-transform: uppercase`, small sizes (`0.6rem`–`0.75rem`).
 
-## Common styled primitives
+## Shared primitives — import, don't redefine
+
+`app/src/pages/games/pinmonkey/editor/ui.js` exports the editor's styled primitives:
 
 ```js
-const Label = styled.div`
-  color: ${({ theme: { colors } }) => colors('highlight', 0.55)};
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-bottom: 0.35rem;
-`
+import { ModeButton, SidebarLabel } from './ui'
+// ModeButton: takes $active prop — chrome bg, gold text/border when active
+// SidebarLabel: dim gold uppercase 0.6rem label
+```
 
-const Panel = styled.div`
-  border: 1px solid ${({ theme: { colors } }) => colors('highlight', 0.3)};
-  padding: 0.75rem;
-  background: ${({ theme: { colors } }) => colors('background')};
-`
+`editor/paint-controls.js` exports:
+- `TEXTURES` — the texture list (name/label) for `public/Sprites/Textures/`
+- `<PaintControls>` — shared tiles/decoration/overlay paint sidebar. Sections render only when their props are passed (`onSolidChange` → solid checkbox, `onEraseChange` → erase, `onOpacityChange` → opacity row). Call sites in `main.js` spread a shared `brush` object for the 8 common props.
 
-const ActionButton = styled.button`
-  background: ${({ $active, theme: { colors } }) =>
-    $active ? colors('highlight', 0.2) : colors('chrome')};
-  color: ${({ $active, theme: { colors } }) =>
-    $active ? colors('highlight') : colors('highlight', 0.55)};
-  border: 1px solid ${({ $active, theme: { colors } }) =>
-    $active ? colors('highlight', 0.55) : colors('foreground', 0.15)};
-  padding: 0.35rem 0.75rem;
-  font-family: 'Inconsolata', monospace;
-  cursor: pointer;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  &:hover {
-    background: ${({ theme: { colors } }) => colors('highlight', 0.2)};
-    color: ${({ theme: { colors } }) => colors('highlight')};
-  }
-`
+Only define a new styled component when nothing in `ui.js` fits — and if it's reusable, add it to `ui.js`.
 
+## Editor state patterns (main.js)
+
+- `commitPlacementPatch(placementId, patch)` — updates NPC placement local state AND persists via `dungeonNpcUpdate` when the dungeon is saved. Use this for any placement mutation; never inline the update+persist pair.
+- `PLACEMENT_TILE_FIELDS` — config array (`field`, `label`, `hint`, `glyph`, `dashed`) driving both map tile markers (`<TileMarker>`) and sidebar pickers (`renderTilePicker`). To add a new pickable tile field on placements: add an entry here + add the field to the API (see the npc-placement-field skill). No new state or handlers needed.
+- `pickingTileFor` — single pick-mode state `{ id, field }`. Click handler writes `{ [field]: { x: col, y: row } }`. Don't add parallel picking states.
+
+```js
 const IconButton = styled.button`
   display: flex;
   align-items: center;
