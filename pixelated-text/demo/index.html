@@ -8,53 +8,78 @@
       font-family: sans-serif;
       background: #1a1a2e;
       color: #eee;
-      padding: 2rem;
+      padding: 0;
+      margin: 0;
     }
     section {
-      margin-bottom: 2.5rem;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 0 2rem;
+      border-bottom: 1px dashed #444;
     }
     label {
       display: block;
       font-size: 0.8rem;
       opacity: 0.7;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .intro {
+      min-height: 60vh;
     }
   </style>
 </head>
 <body>
-  <h1>PixelText demo</h1>
+  <section class="intro">
+    <h1>PixelText scroll demo</h1>
+    <p>Scroll down — each heading's pixels fly in from offscreen the first
+       time it enters view, then hand off to the next heading.</p>
+  </section>
 
   <section>
-    <label>Default (scale 2, black on transparent)</label>
+    <label>from: offscreen (default when nothing has animated yet)</label>
     <div id="headline">HELLO WORLD</div>
   </section>
 
   <section>
-    <label>Larger scale, custom colors</label>
+    <label>from: auto — flies in from headline's pixel positions</label>
     <div id="score">SCORE: 042</div>
   </section>
 
   <section>
-    <label>options.text overrides the element's own text</label>
+    <label>from: auto — flies in from score's pixel positions</label>
     <div id="clock">this text is ignored</div>
+  </section>
+
+  <section>
+    <label>from: offscreen (explicit) — ignores the chain</label>
+    <div id="standalone">FRESH START</div>
   </section>
 
   <script src="../src/font.js"></script>
   <script src="../src/pixelText.js"></script>
   <script>
-    PixelText.replace('headline', { scale: 3 });
+    PixelText.animateIn('headline', { scale: 3 });
 
-    PixelText.replace('score', {
+    PixelText.animateIn('score', {
       scale: 4,
       pixelColor: '#39ff14',
       backgroundColor: '#0d1b0d',
       gap: 4,
     });
 
-    PixelText.replace('clock', {
+    PixelText.animateIn('clock', {
       text: 'PIXEL TEXT LIB',
       scale: 2,
       pixelColor: '#ff2e63',
+    });
+
+    PixelText.animateIn('standalone', {
+      from: 'offscreen',
+      scale: 3,
+      pixelColor: '#ffd23f',
+      stagger: 40,
     });
   </script>
 </body>

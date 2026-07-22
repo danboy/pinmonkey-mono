@@ -21,7 +21,8 @@ No dependencies, no build step. Works as a pair of `<script>` tags or via
 </script>
 ```
 
-See `demo/index.html` for a full example (open it directly in a browser).
+See `demo/index.html` for a full example (open it directly in a browser, then
+scroll — it uses `animateIn`).
 
 ### Node / bundler
 
@@ -49,6 +50,42 @@ Returns the inserted container, or `null` if no element with that id exists.
 | `backgroundColor` | `'transparent'` | fill color for the sprite background                    |
 | `scale`           | `2`           | CSS display scale on top of the 16x16 canvas (e.g. `3` → 48x48px on screen) |
 | `gap`             | `2`           | px gap between character sprites                          |
+
+### `PixelText.animateIn(id, options?)`
+
+Same rendering as `replace`, except every sprite starts **outside the page**
+and flies into its resting position — staggered per character, so the text
+"fills in" left to right — the first time the element scrolls into view.
+
+```js
+PixelText.animateIn('headline', { scale: 3 });
+```
+
+By default (`from: 'auto'`), the first `animateIn` call on a page flies its
+sprites in from offscreen; every call after that flies in from the *previous*
+`animateIn` element's current sprite positions instead, so scrolling past one
+pixel-text element visually hands its pixels off to the next one. Pass
+`from: 'offscreen'` to always fly from outside the viewport regardless of
+what animated before it, or `from: 'previous'` to force chaining (falls back
+to offscreen if nothing has animated yet).
+
+Returns `{ container, disconnect }` (call `disconnect()` to stop observing,
+e.g. on component unmount), or `null` if no element with that id exists.
+
+Additional `options` on top of `replace`'s:
+
+| option      | default                              | description                                                        |
+|-------------|---------------------------------------|--------------------------------------------------------------------|
+| `from`      | `'auto'`                               | `'auto'`, `'offscreen'`, or `'previous'` — see above                |
+| `duration`  | `700`                                  | ms for a single sprite's flight                                    |
+| `stagger`   | `25`                                   | ms added per character index, so sprites arrive in sequence         |
+| `easing`    | `'cubic-bezier(0.16, 1, 0.3, 1)'`      | CSS transition timing function                                     |
+| `threshold` | `0.2`                                  | `IntersectionObserver` threshold                                    |
+| `rootMargin`| `'0px'`                                | `IntersectionObserver` root margin                                  |
+| `once`      | `true`                                 | if `false`, the element re-hides on scrolling out and re-animates on re-entry |
+
+Falls back to revealing immediately (no animation) in environments without
+`IntersectionObserver`.
 
 ### Font coverage
 
